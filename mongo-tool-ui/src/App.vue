@@ -27,21 +27,6 @@
     <create-connection :connection = "createConnectionInfo"
                        @cancel-connection="cancelConnection"
                        @create-connection-sucess="createConnectionSuccess"></create-connection>
-    <!--<el-dialog title="创建连接" :visible.sync="connectionDialogVisible" width = "40%">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="连接名称" prop="name">
-          <el-input v-model="ruleForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="url" prop="url">
-          <el-input type="textarea" v-model="ruleForm.url" placeholder="mongodb://localhost:27017/"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="success" @click="testConnection('ruleForm')" plain>测试连接</el-button>
-          <el-button type="primary" @click="createConnection('ruleForm')" plain>创建连接</el-button>
-          <el-button @click="cancelConnection" plain>取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>-->
   </div>
 </template>
 
