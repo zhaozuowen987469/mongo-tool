@@ -1,23 +1,21 @@
 package com.rrtv.mongo.tool.service.impl;
 
-import com.rrtv.SQLToMongoTemplate;
-import com.rrtv.exception.SqlParserException;
 import com.rrtv.mongo.tool.service.MongoSQLExecuteService;
 import com.rrtv.mongo.tool.vo.result.ExecuteSQLResultVo;
 import com.rrtv.mongo.tool.vo.result.NotQueryExecuteSQLResultVo;
 import com.rrtv.mongo.tool.vo.result.QueryExecuteSQLResultVo;
-import com.rrtv.parser.ProjectSQLParser;
-import com.rrtv.parser.data.ProjectData;
-import com.rrtv.util.SqlCommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.sqltomongo.SQLToMongoTemplate;
+import org.sqltomongo.exception.SqlParserException;
+import org.sqltomongo.parser.ProjectSQLParser;
+import org.sqltomongo.parser.data.ProjectData;
+import org.sqltomongo.parser.util.ProjectSQLParserUtil;
+import org.sqltomongo.util.SqlCommonUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -65,8 +63,15 @@ public class MongoSQLExecuteServiceImpl implements MongoSQLExecuteService {
             data = sqlToMongoTemplate.selectList(sql, Map.class);
             PlainSelect plainSelect = SqlCommonUtil.parserSelectSql(sql);
             // 解析 投影字段
-            List<ProjectData> projectData = ProjectSQLParser.parser(plainSelect.getSelectItems());
+            List<ProjectData> projectData = ProjectSQLParserUtil.parser(plainSelect.getSelectItems());
             columns = projectData.stream().map(item -> StringUtils.isNotEmpty(item.getAlias()) ? item.getAlias() : item.getField()).collect(Collectors.toList());
+            data = data.stream().map(item -> {
+                if(item.containsKey("_id") && item.get("_id") != null){
+                    Object id = item.get("_id");
+                    item.put("_id", id.toString());
+                }
+                return item;
+            }).collect(Collectors.toList());
         } catch (Exception ex) {
             log.error("执行SQL查询失败：{}", ex);
             return QueryExecuteSQLResultVo.fail(ex.getMessage());

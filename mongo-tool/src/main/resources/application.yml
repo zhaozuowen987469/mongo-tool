@@ -32,10 +32,8 @@ server:
 logging:
   level:
     com.rrtv: debug
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
   path: /data/logs/${spring.application.name}
-
-
-
 
 
 

@@ -55,16 +55,27 @@
                                 </template>-->
                 </el-tab-pane>
                 <el-tab-pane label="结果">
-                    <el-table
-                            :data="tableData"
-                            border
+                    <el-table :data="tableData"
+                            border highlight-current-row="true"
                             :style="{width: '100%', height: `${tablesHeight - 80}px`}">
-                        <el-table-column
+                        <!--<el-table-column
                                 v-for="item in columns"
                                 :key="item.value"
                                 :prop="item.value"
-                                :label="item.label"
-                        />
+                                :label="item.label"/>-->
+
+
+                        <el-table-column  v-for="(item,index) in columns"
+                                         :key="index" show-overflow-tooltip="true"
+                                         :prop = "item.value"
+                                         :label="item.label">
+                            <template scope="scope">
+                                {{scope.row[item.value]}}
+                            </template>
+                        </el-table-column>
+
+
+
                     </el-table>
                 </el-tab-pane>
             </el-tabs>
@@ -213,11 +224,14 @@ export default {
                         this.runResult = `成功查询 ${data.length} 条数据`
                         if (data.length > 0) {
                             this.tableData = [...data]
+                            console.log(this.tableData);
                             columns.forEach(column => this.columns.push({ label: column,value: column }))
                         }
                     } else {
                         // 执行失败
-
+                        this.runType = 3
+                        this.runResult = '服务器报错了，赶紧瞧瞧吧，别被优化了, 错误明细：' + failMessage;
+                        this.tableData = [];
                     }
                 } else {
                     // 非查询语句
