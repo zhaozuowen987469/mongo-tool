@@ -1,21 +1,18 @@
 package com.rrtv.mongo.tool.service.impl;
 
+import cn.org.wangchangjiu.sqltomongo.core.exception.SqlParserException;
+import cn.org.wangchangjiu.sqltomongo.core.parser.data.PartSQLParserData;
+import cn.org.wangchangjiu.sqltomongo.core.util.SqlCommonUtil;
 import com.rrtv.mongo.tool.service.MongoSQLExecuteService;
 import com.rrtv.mongo.tool.vo.result.ExecuteSQLResultVo;
 import com.rrtv.mongo.tool.vo.result.NotQueryExecuteSQLResultVo;
 import com.rrtv.mongo.tool.vo.result.QueryExecuteSQLResultVo;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.sqltomongo.SQLToMongoTemplate;
-import org.sqltomongo.exception.SqlParserException;
-import org.sqltomongo.parser.ProjectSQLParser;
-import org.sqltomongo.parser.data.ProjectData;
-import org.sqltomongo.parser.util.ProjectSQLParserUtil;
-import org.sqltomongo.util.SqlCommonUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -61,10 +58,9 @@ public class MongoSQLExecuteServiceImpl implements MongoSQLExecuteService {
         List<Map> data;
         try {
             data = sqlToMongoTemplate.selectList(sql, Map.class);
-            PlainSelect plainSelect = SqlCommonUtil.parserSelectSql(sql);
             // 解析 投影字段
-            List<ProjectData> projectData = ProjectSQLParserUtil.parser(plainSelect.getSelectItems());
-            columns = projectData.stream().map(item -> StringUtils.isNotEmpty(item.getAlias()) ? item.getAlias() : item.getField()).collect(Collectors.toList());
+            PartSQLParserData parserData = sqlToMongoTemplate.sqlParserData(sql);
+            columns = parserData.getProjectData().stream().map(item -> StringUtils.isNotEmpty(item.getAlias()) ? item.getAlias() : item.getField()).collect(Collectors.toList());
             data = data.stream().map(item -> {
                 if(item.containsKey("_id") && item.get("_id") != null){
                     Object id = item.get("_id");
