@@ -18,7 +18,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/mongo_tool
+      uri: mongodb://root:19921226wcj@192.168.0.52:27017/mongo_tool
       auto-index-creation: true
 
 server:
